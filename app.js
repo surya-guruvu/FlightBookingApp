@@ -10,20 +10,9 @@ app.get('/',(req,res)=>{
 	res.send("Welcome to root url of server")
 });
 
-app.post('/',(req,res)=>{
-	res.send(`Welcome ${req.body.name}`);
-});
+var flightRouter = require('./routes/flightRouter');
 
-app.post("/post", (req, res) => {
-  console.log("Connected to React");
-  res.redirect("/");
-});
-
-app.get('/hello',(req,res)=>{
-	res.status(200);
-	res.set('Content-Type','text/html');
-	res.send('<h1> Hello Surya, Welcome to ur 30 day challenge </h1>');
-});
+app.use('/flights',flightRouter);
 
 app.listen(PORT, (error)=>{
 	if(!error){
