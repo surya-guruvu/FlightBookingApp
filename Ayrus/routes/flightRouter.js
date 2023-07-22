@@ -8,7 +8,7 @@ flightRouter.use(bodyParser.json());
 
 flightRouter.route('/')
 .get((req,res,next)=>{
-	res.end("These are all the available flights");
+	res.json({"data":"These are all the available flights"});
 })
 .post((req, res, next) => {
     res.end('Will add this flight: ' + req.body.name + ' with details: ' + req.body.description);

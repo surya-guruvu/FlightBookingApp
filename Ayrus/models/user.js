@@ -1,0 +1,29 @@
+var mongoose=require('mongoose');
+var Schema=mongoose.Schema;
+
+passportLocalMongoose=require('passport-local-mongoose');
+
+var User=new Schema({
+	// firstName: {
+	// 	type: String,
+	// 	default: ''
+	// },
+	// lastName: {
+	// 	type: String,
+	// 	default: ''
+	// },
+	email: {
+		type: String,
+		default: 'kleerfref;el',
+        unique: false
+	},
+	// admin: {
+	// 	type: Boolean,
+    //     default: false
+	// }
+});
+
+User.plugin(passportLocalMongoose); //Adds hash and salt, and additonal methods on user useful for authentication.
+
+var user=mongoose.model('User',User);
+module.exports=user;

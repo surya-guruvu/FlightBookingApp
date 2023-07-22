@@ -3,13 +3,24 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+const passport = require('passport');
+const mongoose = require('mongoose');
+
+var session = require('express-session');
+var FileStore = require('session-file-store')(session);
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var flightRouter = require('./routes/flightRouter');
 
+
+const cors = require('cors');
+
+const User = require('./models/user');
+
 var app = express();
 
+app.use(cors());
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
@@ -19,6 +30,39 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.json());
+
+const url='mongodb://localhost:27017/Ayrus';
+const connect=mongoose.connect(url);
+connect.then((db)=>{
+  console.log("connected correctly to the server");
+})
+.catch((err)=>{
+  console.log(err);
+})
+
+app.use(session({
+  name: 'session-id',
+  secret: '12345-67890-09876-54321',
+  saveUninitialized: false,
+  resave: false,
+  store: new FileStore()
+}));
+
+
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+const LocalStrategy = require('passport-local').Strategy;
+passport.use(new LocalStrategy(User.authenticate()));
+
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
+
+
+
+
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
