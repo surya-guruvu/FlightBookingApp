@@ -4,10 +4,12 @@ const bodyParser = require('body-parser');
 
 const flightRouter = express.Router();
 
+var authenticate = require("../authenticate");
+
 flightRouter.use(bodyParser.json());
 
 flightRouter.route('/')
-.get((req,res,next)=>{
+.get(authenticate.verifyUser,(req,res,next)=>{
 	res.json({"data":"These are all the available flights"});
 })
 .post((req, res, next) => {

@@ -5,18 +5,19 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const passport = require('passport');
 const mongoose = require('mongoose');
+const fs = require('fs');
 
 var session = require('express-session');
-var FileStore = require('session-file-store')(session);
+// var FileStore = require('session-file-store')(session);
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var flightRouter = require('./routes/flightRouter');
+var authenticate = require('./authenticate');
+var fileUpload = require('./routes/fileUpload');
 
 
 const cors = require('cors');
-
-const User = require('./models/user');
 
 var app = express();
 
@@ -27,7 +28,7 @@ app.set('view engine', 'jade');
 
 app.use(logger('dev'));
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
@@ -41,32 +42,12 @@ connect.then((db)=>{
   console.log(err);
 })
 
-app.use(session({
-  name: 'session-id',
-  secret: '12345-67890-09876-54321',
-  saveUninitialized: false,
-  resave: false,
-  store: new FileStore()
-}));
-
-
-
 app.use(passport.initialize());
-app.use(passport.session());
-
-const LocalStrategy = require('passport-local').Strategy;
-passport.use(new LocalStrategy(User.authenticate()));
-
-passport.serializeUser(User.serializeUser());
-passport.deserializeUser(User.deserializeUser());
-
-
-
-
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/flights',flightRouter);
+app.use('/upload_files',fileUpload);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

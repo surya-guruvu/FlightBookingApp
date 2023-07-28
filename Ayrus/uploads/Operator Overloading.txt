@@ -1,0 +1,26 @@
+
+Assignment -2
+
+Topic -- Operator Overloading
+	
+
+Q1:- Create a C/C++ Program to demonstrate Operator Overloading Concept.
+	1:)Write a C++ program to overload unary operators that is increment and decrement.
+	   Increment ++ and decrement -- are the unary operators. 
+           You need to take two numbers x and y as data member of the class and make 3 data member functions(2 for operator increment and decrement and 1 for display the data after increment and decrement)
+        2:) Write a C++ program to overload binary operator '+' to add two complex numbers.
+	   You need to add two complex number and display the data after adding these 2 numbers.
+           Take 2 number as input data member of the class and 2 data member function. 1 for overloading and other for display.
+        3:) Write a C++ program to overload binary operator '+' to add two complex numbers by using friend function. 
+Q2:- Create a Class Clock which contains these 3 inputs as data members
+	1:- hours
+	2:- Minutes
+	3:- Secodns
+Then Write a C++ program which using operator overloading for the below operators.
+	1:) << To Display the time.
+	2:) >> To accept the time.
+	3:) == To check whether the 2 time are same or not.
+
+You need to take 2 set of input from the user and then execute the above 3 operations.	   
+	
+Q1

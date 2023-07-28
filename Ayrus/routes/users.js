@@ -2,6 +2,7 @@ var express = require('express');
 const bodyParser=require('body-parser');
 var User=require('../models/user');
 var passport = require('passport');
+var authenticate = require('../authenticate');
 
 
 var router = express.Router();
@@ -33,11 +34,36 @@ router.post('/signUp', (req, res, next) => {
 
 
 //passport.authenticate automatically adds user property to the body. we can use req.user
-router.post('/login',passport.authenticate('local'),(req,res)=>{  //If any error at passport.authenticate, then it will tell the user about the error, else moves on to callback function
+router.post('/login',passport.authenticate('local',{session:false}),(req,res)=>{  
+  /*f any error at passport.authenticate, then it will tell the user about the error, 
+  else moves on to callback function*/
+  var token1 = authenticate.getToken({_id: req.user._id});
   res.statusCode = 200; 
+  console.log(token1);
   res.setHeader('Content-Type', 'application/json');
-  res.json({success:true,status: 'You are Successfully logged in!'}); 
-})
+  res.json({success:true,tok:token1,status: 'You are Successfully logged in!'}); 
+});
+
+
+router.post("/change-password", authenticate.verifyUser, async (req, res) => {
+  const { currentPassword, newPassword } = req.body;
+
+  try {
+    const user = await UserModel.findById(req.user._id);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Use passport-local-mongoose's changePassword method to handle password change
+    await user.changePassword(currentPassword, newPassword);
+
+    return res.status(200).json({ message: "Password changed successfully" });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Server error" });
+  }
+});
 
 
 module.exports = router;
