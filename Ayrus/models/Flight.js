@@ -22,6 +22,14 @@ var FlightSchema = new Schema({
         type: Number,
         required: true,
     },
+    startTime: {
+        type: Date,
+        required: true,
+      },
+    endTime: {
+        type: Date,
+        required: true,
+    },
 });
 FlightSchema.index({ flightNumber: 1, date: 1 }, { unique: true });
 

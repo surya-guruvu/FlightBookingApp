@@ -4,19 +4,12 @@ var Schema=mongoose.Schema;
 passportLocalMongoose=require('passport-local-mongoose');
 
 var User=new Schema({
-	// firstName: {
-	// 	type: String,
-	// 	default: ''
-	// },
-	// lastName: {
-	// 	type: String,
-	// 	default: ''
-	// },
 	email: {
 		type: String,
 		default: 'kleerfref;el',
         unique: false
 	},
+	
 	// admin: {
 	// 	type: Boolean,
     //     default: false

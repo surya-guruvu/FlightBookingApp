@@ -1,12 +1,45 @@
 const express = require('express');
-
 const bodyParser = require('body-parser');
-
 const flightRouter = express.Router();
-
 var authenticate = require("../authenticate");
-
 const Flight = require("../models/Flight");
+
+// const redisClient = require("./redisClient");
+
+// const cacheFlightData = (req,res,next)=>{
+//     const cacheKey = JSON.stringify(req.query).toLowerCase();
+
+//     redisClient.get(cacheKey,(err,cachedData)=>{
+//         if(err){
+//             console.error("Redis Error:",err);
+//         }
+//         if(cachedData){
+//             const flightData = JSON.parse(cachedData);
+//             res.status(200).json({ data: filteredFlights });
+
+//         }
+//         else{
+//             const { origin, destination, date, passengers } = req.query;
+//             Flight.find({
+//                 origin: {$regex: origin, $options: 'i'},
+//                 destination: { $regex: destination, $options: 'i' },
+//                 seatsAvailable: { $gte: passengers },
+//                 date: date,
+//             })
+//             .then((filteredFlights)=>{
+//                 // console.log(filteredFlights);
+//                 redisClient.setEx(cacheKey, 3600, JSON.stringify(filteredFlights)); (can also be used for updation)
+//                 res.status(200).json({ data: filteredFlights });
+
+//             })
+//             .catch((error)=>{
+//                 console.error(error);
+//                 res.status(500).json({ error: 'Internal server error' });
+//             });
+//         }
+        
+//     });
+// };
 
 flightRouter.use(bodyParser.json());
 
@@ -21,22 +54,27 @@ flightRouter.route('/')
     })
     .then((filteredFlights)=>{
         // console.log(filteredFlights);
+        console.log(filteredFlights);
         res.status(200).json({ data: filteredFlights });
     })
     .catch((error)=>{
         console.error(error);
         res.status(500).json({ error: 'Internal server error' });
     });
-})
+}) 
+
+//Implement cache invalidate protocols
 .post((req, res, next) => {
-    // res.end('Will add this flight: ' + req.body.name + ' with details: ' + req.body.description);
-    const { flightNumber, origin, destination, date, seatsAvailable } = req.body;
+    console.log("Yeah");
+    const { flightNumber, origin, destination, date, seatsAvailable, startTime, endTime} = req.body;
     const newFlight = new Flight({
         flightNumber:flightNumber,
         origin:origin,
         destination:destination,
         date:date,
-        seatsAvailable:seatsAvailable
+        seatsAvailable:seatsAvailable,
+        startTime: startTime,
+        endTime: endTime,
     });
 
     newFlight.save()
@@ -55,34 +93,6 @@ flightRouter.route('/')
     res.end('Cancelling all flights');
 });
 
-
-flightRouter.route('/book')
-.post((req,res,next)=>{
-    const {flightId} = req.body;
-
-    Flight.findById(flightId)
-    .then((flight)=>{
-        if(!flight){
-            return res.status(404).json({error:"Flight Not find"});
-        }
-        else if(flight.seatsAvailable<=0){
-            return res.status(400).json({error:"No seats available in the flight"});
-        }
-        else{
-            const bookedFlight = {
-                flightNumber: flight.flightNumber,
-                flightId: flight._id,
-              };
-      
-              // Update the seats available and save the updated flight
-              flight.seatsAvailable--;
-              flight.save().then(() => {
-                res.status(200).json(bookedFlight);
-              });
-        }
-    })
-
-});
 
 
 module.exports = flightRouter;

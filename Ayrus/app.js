@@ -18,6 +18,7 @@ var fileUpload = require('./routes/fileUpload');
 
 
 const cors = require('cors');
+const bookRouter = require('./routes/bookRouter');
 
 var app = express();
  
@@ -48,6 +49,7 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/flights',flightRouter);
 app.use('/upload_files',fileUpload);
+app.use('/book_flight',bookRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
