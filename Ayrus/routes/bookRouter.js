@@ -9,7 +9,7 @@ bookRouter.route('/')
 .post(authenticate.verifyUser,(req,res,next)=>{
     const {bookings,flightId} = req.body;
     console.log(req.user._id);
-
+    // console.log(kdk.jje);
     const savePromises = [];
 
     bookings.forEach(bookingData => {
@@ -52,6 +52,7 @@ bookRouter.route('/')
 
 bookRouter.get('/',authenticate.verifyUser,(req,res,next)=>{
     Booking.find({user:req.user._id}).populate('user').populate('flight')
+    
 
     .then((filteredBookings)=>{
         console.log(filteredBookings);
