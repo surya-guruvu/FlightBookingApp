@@ -22,6 +22,10 @@ var BookSchema = new Schema({
     user:{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
+    },
+    cancelled: {
+        type: Boolean, 
+        default: false
     }
 });
 

@@ -4,12 +4,21 @@ const Booking = require("../models/Book");
 const authenticate = require("../authenticate");
 const Flight = require("../models/Flight");
 const bookRouter = express.Router();
+const nodemailer = require('nodemailer');
 
+const transporter = nodemailer.createTransport({
+    service : 'Gmail',
+    auth: {
+        user: 'suryaguruvu2000@gmail.com',
+        pass: 'vppz omns ycvw rtzi'
+    }
+});
+ 
 bookRouter.route('/')
 .post(authenticate.verifyUser,(req,res,next)=>{
     const {bookings,flightId} = req.body;
     console.log(req.user._id);
-    // console.log(kdk.jje);
+
     const savePromises = [];
 
     bookings.forEach(bookingData => {
@@ -29,7 +38,7 @@ bookRouter.route('/')
         .then((savedBookings)=>{
             Flight.findByIdAndUpdate(
                 flightId,
-                { $inc: { seatsAvailable: -bookings.length } }, // Decrement available seats by the number of bookings
+                { $inc: { seatsAvailable: -savedBookings.length } }, // Decrement available seats by the number of bookings
                 { new: true }
             )
             .then(updatedFlight => {
@@ -37,6 +46,22 @@ bookRouter.route('/')
                     return res.status(404).json({ message: "Flight not found" });
                 }
 
+                savedBookings.map(savedBooking=>{
+                    const mailOptions = {
+                        from: 'suryaguruvu2000@gmail.com',
+                        to: savedBooking.email,
+                        subject: 'Flight Booking Confirmation',
+                        text: `Dear ${savedBooking.name},\n\nYour booking for flight ${updatedFlight.flightNumber} has been confirmed.\n\nThank you for choosing our service!`
+                    };
+
+                    transporter.sendMail(mailOptions,(err,info)=>{
+                        if (err) {
+                            console.log('Error sending email: ', err);
+                        } else {
+                            console.log('Email sent: ', info.response);
+                        }
+                    });
+                });
                 res.status(201).json({ savedBookings, updatedFlight });
             })
             .catch(error => {
@@ -55,8 +80,19 @@ bookRouter.get('/',authenticate.verifyUser,(req,res,next)=>{
     
 
     .then((filteredBookings)=>{
-        console.log(filteredBookings);
-        res.status(200).json({ data: filteredBookings });
+        const sanitizedBookings = filteredBookings.map((booking)=>{
+            if(booking.flight){
+                return booking;
+            }
+            else{
+                booking.flight = {"cancelled":"Flight Is Cancelled"};
+                return booking;
+            }
+        });
+
+        // console.log(filteredBookings);
+        console.log(sanitizedBookings);
+        res.status(200).json({ data: sanitizedBookings});
     })
     .catch((error)=>{
         console.error(error);

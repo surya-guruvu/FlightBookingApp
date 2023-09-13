@@ -52,7 +52,7 @@ router.post('/signUp', (req, res, next) => {
     res.status(400).json({ errors: validationErrors });
   });
 
-
+ 
 });
 
 
@@ -69,6 +69,10 @@ router.post('/login',passport.authenticate('local',{session:false}),(req,res)=>{
 
 });
 
+router.get('/check_auth',authenticate.verifyUser,(req,res,next)=>{
+  res.statusCode = 200;
+  res.send("You are loggedIn")
+});
 
 router.post("/change-password", authenticate.verifyUser, async (req, res) => {
   const { currentPassword, newPassword } = req.body;

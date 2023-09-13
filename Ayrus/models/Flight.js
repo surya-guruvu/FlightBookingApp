@@ -30,6 +30,10 @@ var FlightSchema = new Schema({
         type: Date,
         required: true,
     },
+    cancelled: {
+        type: Boolean, 
+        default: false
+    }
 });
 FlightSchema.index({ flightNumber: 1, date: 1 }, { unique: true });
 
