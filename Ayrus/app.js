@@ -41,15 +41,15 @@ app.use(Sentry.Handlers.tracingHandler()); // for express
 //Because of this, If error is not being handled by catch then it automatically sends to sentry
 //Else, we have to send using Sentry.captureException() 
 
-io.on('connection', (socket) => {
-  console.log('A user connected');
+// io.on('connection', (socket) => {
+//   console.log('A user connected');
 
-  // Define your Socket.io event handlers here
+//   // Define your Socket.io event handlers here
 
-  socket.on('disconnect', () => {
-    console.log('User disconnected');
-  });
-});
+//   socket.on('disconnect', () => {
+//     console.log('User disconnected');
+//   });
+// });
 
 
 var indexRouter = require('./routes/index');
@@ -58,6 +58,7 @@ var flightRouter = require('./routes/flightRouter');
 var authenticate = require('./authenticate');
 var fileUpload = require('./routes/fileUpload');
 const bookRouter = require('./routes/bookRouter');
+const notificationRouter = require('./routes/notificationsRouter');
 
 
  
@@ -80,6 +81,7 @@ app.use('/users', usersRouter);
 app.use('/flights',flightRouter);
 app.use('/upload_files',fileUpload);
 app.use('/book_flight',bookRouter);
+app.use('/notifications',notificationRouter);
 
 
 

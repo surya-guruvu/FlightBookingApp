@@ -4,6 +4,7 @@ const flightRouter = express.Router();
 var authenticate = require("../authenticate");
 const Flight = require("../models/Flight");
 const Book = require("../models/Book");
+const Notification = require("../models/Notification");
 
 flightRouter.use(bodyParser.json());
  
@@ -15,6 +16,7 @@ flightRouter.route('/')
         destination: { $regex: destination, $options: 'i' },
         seatsAvailable: { $gte: passengers },
         date: date,
+        cancelled:false,
     })
     .then((filteredFlights)=>{
         res.status(200).json({ data: filteredFlights });
@@ -55,18 +57,10 @@ flightRouter.route('/')
     const flightNumber = req.query.flightNumber;
     const date = req.query.date;
 
-    
-
-    // console.log(req.body);
-
     console.log(date);
     console.log(flightNumber);
 
-    Flight.findOneAndUpdate({
-    // Flight.findOneAndRemove({
-        flightNumber:flightNumber,
-        date:date,
-    }, {$set: {cancelled:true}})
+    Flight.findOneAndUpdate({flightNumber:flightNumber,date:date,}, {$set: {cancelled:true}})
     .then((deletedFlight)=>{
         console.log("Deleted Flight:",deletedFlight);
 
@@ -77,6 +71,27 @@ flightRouter.route('/')
         .catch((error) => {
           console.error('Error updating bookings:', error);
         });
+
+        Book.find({flight:deletedFlight._id}).populate('user')
+        .then((bookings)=>{
+            bookings.map((booking)=>{
+                console.log(booking);
+                console.log(booking.user);
+                const newNotification = new Notification({
+                    user: booking.user._id,
+                    message: `Your Booking for Flight ${deletedFlight.flightNumber} on ${deletedFlight.date} under the name of ${booking.name} is cancelled. Sorry for Inconvenience`,
+                });
+                newNotification.save()
+                .then((savedNotification)=>{
+                    console.log("Saved Notifcation:",savedNotification);
+                })
+                .catch((err)=>{console.log(err)});
+            });
+        })
+        .catch((error) => {
+            console.error('Error in Notifications:', error);
+        });
+
 
         res.statusCode = 200;
         res.end(`Cancelled Flight ${deletedFlight.flightNumber}`);
