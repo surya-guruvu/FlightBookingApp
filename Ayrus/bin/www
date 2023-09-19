@@ -3,10 +3,12 @@
 /**
  * Module dependencies.
  */
-
+ 
 var app = require('../app');
 var debug = require('debug')('ayrus:server');
 var http = require('http');
+const socketIo = require('socket.io');
+
 
 
 
@@ -22,9 +24,6 @@ app.set('port', port);
  */
 
 var server = http.createServer(app);
-var io = require('socket.io')(server); 
-
-module.exports = {io};
 
 /**
  * Listen on provided port, on all network interfaces.
@@ -33,6 +32,34 @@ module.exports = {io};
 server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
+
+const io = socketIo(server);
+
+
+
+// const roomSocketMap = new Map();
+
+io.on('connection', (socket) => {
+  console.log('A user connected');
+  const token = socket.handshake.query.token;
+  
+  socket.join(token);
+
+  console.log(socket.id);
+  socket.on('user_joined',(data)=>{
+    console.log(data.username);
+  })
+
+  // socket.on()
+
+  socket.on('disconnect', () => {
+    console.log(socket.id);
+    console.log('User disconnected');
+  });
+
+});
+
+module.exports = {io};
 
 /**
  * Normalize a port into a number, string, or false.

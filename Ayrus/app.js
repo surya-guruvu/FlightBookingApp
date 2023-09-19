@@ -13,6 +13,11 @@ var session = require('express-session');
 // var FileStore = require('session-file-store')(session);
 
 
+
+
+
+
+
 const cors = require('cors');
 
 var app = express();
@@ -41,6 +46,9 @@ app.use(Sentry.Handlers.tracingHandler()); // for express
 //Because of this, If error is not being handled by catch then it automatically sends to sentry
 //Else, we have to send using Sentry.captureException() 
 
+
+// const io = socketIo(server);
+
 // io.on('connection', (socket) => {
 //   console.log('A user connected');
 
@@ -50,6 +58,7 @@ app.use(Sentry.Handlers.tracingHandler()); // for express
 //     console.log('User disconnected');
 //   });
 // });
+
 
 
 var indexRouter = require('./routes/index');
